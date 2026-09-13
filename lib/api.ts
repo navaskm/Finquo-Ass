@@ -21,8 +21,8 @@ export async function analyseAudio(file: File): Promise<AnalysisResult> {
       if (data.message) {
         message = data.message;
       }
-    } catch {
-      // Keep the default error message.
+    } catch (error) {
+      console.log(error)
     }
 
     throw new Error(message);
