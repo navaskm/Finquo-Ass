@@ -1,9 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { AudioRecorder } from "@/components/audio/AudioRecorder";
+import { AudioUploader } from "@/components/audio/AudioUploader";
+import { formatDuration, formatFileSize } from "@/lib/audio";
+
 
 export default function Home() {
+
   const [mode, setMode] = useState<"record" | "upload">("record");
+  const [file, setFile] = useState<File | null>(null);
+  const [duration, setDuration] = useState(0);
+
+  const handleAudioReady = useCallback((nextFile: File, nextDuration: number) => {
+    setFile(nextFile);
+    setDuration(nextDuration);
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#f7f5f0] px-4 py-8 sm:px-6 lg:px-8">
@@ -66,7 +78,7 @@ export default function Home() {
               </button>
             </div>
 
-            {mode === "record" ? (
+            {/* {mode === "record" ? (
               <div className="rounded-2xl border border-dashed border-[#d8d2c8] p-8 text-center">
                 <p className="text-sm text-[#77736c]">
                   Record your mentorship session directly in the browser.
@@ -92,7 +104,44 @@ export default function Home() {
                   Choose audio file
                 </button>
               </div>
+            )} */}
+
+
+            {mode === "record" ? (
+              <AudioRecorder onAudioReady={handleAudioReady} />
+            ) : (
+              <AudioUploader onAudioReady={handleAudioReady} />
             )}
+
+
+
+            {file && (
+              <div className="mt-6 rounded-2xl border border-[#e2ddd4] bg-[#faf9f7] p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-[#252421]">
+                      {file.name}
+                    </p>
+
+                    <p className="mt-1 text-xs text-[#817c74]">
+                      {formatFileSize(file.size)} · {formatDuration(duration)}
+                    </p>
+                  </div>
+
+                  <span className="shrink-0 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
+                    Ready
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  className="mt-4 w-full rounded-xl bg-[#252421] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#3a3935]"
+                >
+                  Analyse recording
+                </button>
+              </div>
+            )}
+
           </div>
 
           <p className="mt-5 text-center text-xs text-[#96918a]">
