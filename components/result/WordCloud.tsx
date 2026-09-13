@@ -21,7 +21,7 @@ interface WordCloudProps {
 
 export function WordCloud({ terms }: WordCloudProps) {
   return (
-    <div className="overflow-hidden rounded-3xl border border-[#e2ddd4] bg-white p-3 sm:p-6">
+    <div data-word-cloud className="overflow-hidden rounded-3xl border border-[#e2ddd4] bg-white p-3 sm:p-6">
       <div className="mb-4 px-2">
         <h2 className="text-base font-semibold text-[#252421]">
           Session topics
