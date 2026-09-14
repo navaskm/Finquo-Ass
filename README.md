@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Audio Word Cloud - Frontend
 
-## Getting Started
+The frontend for Audio Word Cloud, a web app that lets users record or upload an audio session and turn the analysed content into a visual word cloud.
 
-First, run the development server:
+The frontend provides the audio recording and upload interface, validation feedback, analysis states, transcript display, word cloud visualisation and saved analyses.
+
+## What I built
+
+The frontend supports:
+
+- Recording audio directly from the browser
+- Starting and stopping recordings
+- Recording timer
+- Audio playback before analysis
+- Discarding and re-recording
+- Uploading MP3, WAV, M4A, AAC, OGG, WEBM and FLAC files
+- File size and duration validation
+- Maximum 25 MB or 10 minutes per audio file
+- Loading and error states during analysis
+- Displaying the generated word cloud
+- Downloading the word cloud as a PNG
+- Viewing the full transcript
+- Copying and downloading the transcript
+- Removing terms from the displayed word cloud
+- Saving analyses locally in the browser
+- Re-opening saved analyses
+- Responsive layout for desktop and mobile screens
+
+The frontend is connected to a separate Express backend for audio analysis and transcription.
+
+## How to run locally
+
+### 1. Clone the frontend repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+git clone <YOUR_FRONTEND_REPOSITORY_URL>
+cd <YOUR_FRONTEND_PROJECT_FOLDER>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tech stack
+  Next.js
+  React
+  TypeScript
+  Tailwind CSS
+  @cp949/react-wordcloud
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Browser APIs used:
+  MediaRecorder API
+  File API
+  Clipboard API
+  localStorage
