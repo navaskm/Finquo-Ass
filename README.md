@@ -33,7 +33,7 @@ The frontend is connected to a separate Express backend for audio analysis and t
 ### 1. Clone the frontend repository
 
 ```bash
-git clone <YOUR_FRONTEND_REPOSITORY_URL>
+git clone https://github.com/navaskm/Finquo-Ass
 cd <YOUR_FRONTEND_PROJECT_FOLDER>
 
 Tech stack
