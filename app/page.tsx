@@ -1,15 +1,21 @@
 "use client";
 
 import { useCallback, useState } from "react";
+
 import { AudioRecorder } from "@/components/audio/AudioRecorder";
 import { AudioUploader } from "@/components/audio/AudioUploader";
 import { AnalysisError } from "@/components/analysis/AnalysisError";
 import { AnalysisLoading } from "@/components/analysis/AnalysisLoading";
-import { DownloadCloud } from "@/components/result/DownloadCloud";
-import { Transcript } from "@/components/result/Transcript";
-import { WordCloud } from "@/components/result/WordCloud";
+
+import AnalysisActions from "@/components/result/AnalysisActions";
+import DownloadCloud from "@/components/result/DownloadCloud";
+import SavedAnalyses from "@/components/result/SavedAnalyses";
+import Transcript from "@/components/result/Transcript";
+import WordCloud from "@/components/result/WordCloud";
+
 import { analyseAudio } from "@/lib/api";
 import { formatDuration, formatFileSize } from "@/lib/audio";
+
 import type { AnalysisResult } from "@/types/analysis";
 
 type Mode = "record" | "upload";
@@ -21,19 +27,33 @@ type AnalysisStatus =
   | "error";
 
 export default function Home() {
-
   const [mode, setMode] = useState<Mode>("record");
+
   const [file, setFile] = useState<File | null>(null);
+
   const [duration, setDuration] = useState(0);
-  const [status, setStatus] = useState<AnalysisStatus>("idle");
-  const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+
+  const [status, setStatus] =
+    useState<AnalysisStatus>("idle");
+
+  const [result, setResult] =
+    useState<AnalysisResult | null>(null);
+
+  const [visibleTerms, setVisibleTerms] = useState<
+    AnalysisResult["terms"]
+  >([]);
+
+  const [error, setError] =
+    useState<string | null>(null);
 
   const handleAudioReady = useCallback(
     (nextFile: File, nextDuration: number) => {
       setFile(nextFile);
       setDuration(nextDuration);
+
       setResult(null);
+      setVisibleTerms([]);
+
       setError(null);
       setStatus("idle");
     },
@@ -49,9 +69,15 @@ export default function Home() {
     setError(null);
 
     try {
-      const analysisResult = await analyseAudio(file);
+      const analysisResult =
+        await analyseAudio(file);
 
       setResult(analysisResult);
+
+      // Keep a separate copy for the bonus
+      // "remove word and re-render" feature.
+      setVisibleTerms(analysisResult.terms);
+
       setStatus("success");
     } catch (error) {
       setStatus("error");
@@ -64,10 +90,35 @@ export default function Home() {
     }
   }
 
+  function handleRemoveTerm(word: string) {
+    setVisibleTerms((currentTerms) =>
+      currentTerms.filter(
+        (term) => term.text !== word,
+      ),
+    );
+  }
+
+  function handleOpenSavedAnalysis(
+    savedAnalysis: AnalysisResult,
+  ) {
+    setResult(savedAnalysis);
+
+    setVisibleTerms(savedAnalysis.terms);
+
+    setFile(null);
+    setDuration(0);
+
+    setError(null);
+    setStatus("success");
+  }
+
   function resetAnalysis() {
     setFile(null);
     setDuration(0);
+
     setResult(null);
+    setVisibleTerms([]);
+
     setError(null);
     setStatus("idle");
   }
@@ -76,7 +127,8 @@ export default function Home() {
     return (
       <main className="min-h-screen bg-[#f7f5f0] px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
-          <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          {/* Header */}
+          <header className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#8b857c]">
                 Analysis complete
@@ -86,13 +138,20 @@ export default function Home() {
                 Your session summary
               </h1>
 
-              <p className="mt-2 text-sm text-[#77736c]">
-                {file?.name}
-              </p>
+              {file && (
+                <p className="mt-2 text-sm text-[#77736c]">
+                  {file.name}
+                </p>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-3">
               <DownloadCloud />
+
+              <AnalysisActions
+                transcript={result.transcript}
+                terms={visibleTerms}
+              />
 
               <button
                 type="button"
@@ -104,10 +163,22 @@ export default function Home() {
             </div>
           </header>
 
-          <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-            <WordCloud terms={result.terms} />
+          {/* Main result */}
+          <div className="space-y-6">
+            <div id="word-cloud">
+              <WordCloud
+                terms={visibleTerms}
+                onRemoveTerm={handleRemoveTerm}
+              />
+            </div>
 
-            <Transcript transcript={result.transcript} />
+            <Transcript
+              transcript={result.transcript}
+            />
+
+            <SavedAnalyses
+              onOpen={handleOpenSavedAnalysis}
+            />
           </div>
         </div>
       </main>
@@ -118,6 +189,7 @@ export default function Home() {
     <main className="min-h-screen bg-[#f7f5f0] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl items-center justify-center">
         <section className="w-full">
+          {/* Page heading */}
           <div className="mb-10 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#252421] text-white">
               <svg
@@ -145,20 +217,24 @@ export default function Home() {
             </h1>
 
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#77736c] sm:text-base">
-              Turn a recorded mentorship session into a clear visual summary
-              of what was discussed.
+              Turn a recorded mentorship session into a
+              clear visual summary of what was discussed.
             </p>
           </div>
 
+          {/* Loading */}
           {status === "analysing" ? (
             <AnalysisLoading />
           ) : status === "error" ? (
+            /* Error */
             <AnalysisError
               message={error ?? "Analysis failed."}
               onRetry={handleAnalyse}
             />
           ) : (
+            /* Audio input */
             <div className="rounded-3xl border border-[#e6e1d8] bg-white p-4 shadow-[0_20px_60px_rgba(37,36,33,0.06)] sm:p-6">
+              {/* Record / Upload tabs */}
               <div className="mb-6 grid grid-cols-2 rounded-2xl bg-[#f5f2ec] p-1">
                 <button
                   type="button"
@@ -185,6 +261,7 @@ export default function Home() {
                 </button>
               </div>
 
+              {/* Audio input */}
               {mode === "record" ? (
                 <AudioRecorder
                   onAudioReady={handleAudioReady}
@@ -195,6 +272,7 @@ export default function Home() {
                 />
               )}
 
+              {/* Selected audio */}
               {file && (
                 <div className="mt-6 rounded-2xl border border-[#e2ddd4] bg-[#faf9f7] p-4">
                   <div className="flex items-center justify-between gap-4">
@@ -226,9 +304,10 @@ export default function Home() {
             </div>
           )}
 
+          {/* Supported formats */}
           <p className="mt-5 text-center text-xs text-[#96918a]">
-            MP3, WAV, M4A, AAC, OGG, WEBM or FLAC · Maximum 25 MB or 10
-            minutes
+            MP3, WAV, M4A, AAC, OGG, WEBM or FLAC ·
+            Maximum 25 MB or 10 minutes
           </p>
         </section>
       </div>

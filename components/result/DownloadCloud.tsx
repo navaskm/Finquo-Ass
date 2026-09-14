@@ -1,16 +1,22 @@
 "use client";
 
+import { Download } from "lucide-react";
+
 interface DownloadCloudProps {
-  filename?: string;
+  targetId?: string;
 }
 
-export function DownloadCloud({
-  filename = "session-word-cloud.png",
+export default function DownloadCloud({
+  targetId = "word-cloud",
 }: DownloadCloudProps) {
-  function downloadCloud() {
-    const svg = document.querySelector(
-      "[data-word-cloud] svg",
-    ) as SVGSVGElement | null;
+  async function handleDownload() {
+    const element = document.getElementById(targetId);
+
+    if (!element) {
+      return;
+    }
+
+    const svg = element.querySelector("svg");
 
     if (!svg) {
       return;
@@ -24,16 +30,14 @@ export function DownloadCloud({
     });
 
     const url = URL.createObjectURL(svgBlob);
+
     const image = new Image();
 
     image.onload = () => {
       const canvas = document.createElement("canvas");
 
-      const width = 1200;
-      const height = 800;
-
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = 1200;
+      canvas.height = 800;
 
       const context = canvas.getContext("2d");
 
@@ -42,26 +46,38 @@ export function DownloadCloud({
         return;
       }
 
-      context.fillStyle = "#ffffff";
-      context.fillRect(0, 0, width, height);
+      context.fillStyle = "#faf7f3";
+      context.fillRect(0, 0, canvas.width, canvas.height);
 
-      context.drawImage(image, 0, 0, width, height);
+      context.drawImage(
+        image,
+        0,
+        0,
+        canvas.width,
+        canvas.height,
+      );
+
+      URL.revokeObjectURL(url);
 
       canvas.toBlob((blob) => {
         if (!blob) {
-          URL.revokeObjectURL(url);
           return;
         }
 
-        const downloadUrl = URL.createObjectURL(blob);
-        const link = document.createElement("a");
+        const downloadUrl =
+          URL.createObjectURL(blob);
+
+        const link =
+          document.createElement("a");
 
         link.href = downloadUrl;
-        link.download = filename;
+        link.download = "word-cloud.png";
+
+        document.body.appendChild(link);
         link.click();
+        link.remove();
 
         URL.revokeObjectURL(downloadUrl);
-        URL.revokeObjectURL(url);
       }, "image/png");
     };
 
@@ -71,9 +87,10 @@ export function DownloadCloud({
   return (
     <button
       type="button"
-      onClick={downloadCloud}
-      className="rounded-xl border border-[#d8d2c8] bg-white px-5 py-3 text-sm font-medium text-[#403d38] transition hover:bg-[#faf9f7]"
+      onClick={handleDownload}
+      className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#5d8f8f] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#4f7f7f]"
     >
+      <Download size={17} />
       Download PNG
     </button>
   );
