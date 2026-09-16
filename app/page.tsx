@@ -27,38 +27,26 @@ type AnalysisStatus =
   | "error";
 
 export default function Home() {
+
   const [mode, setMode] = useState<Mode>("record");
-
   const [file, setFile] = useState<File | null>(null);
-
   const [duration, setDuration] = useState(0);
+  const [status, setStatus] = useState<AnalysisStatus>("idle");
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [visibleTerms, setVisibleTerms] = useState<AnalysisResult["terms"]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const [status, setStatus] =
-    useState<AnalysisStatus>("idle");
 
-  const [result, setResult] =
-    useState<AnalysisResult | null>(null);
+  const handleAudioReady = useCallback((nextFile: File, nextDuration: number) => {
+    setFile(nextFile);
+    setDuration(nextDuration);
 
-  const [visibleTerms, setVisibleTerms] = useState<
-    AnalysisResult["terms"]
-  >([]);
+    setResult(null);
+    setVisibleTerms([]);
 
-  const [error, setError] =
-    useState<string | null>(null);
-
-  const handleAudioReady = useCallback(
-    (nextFile: File, nextDuration: number) => {
-      setFile(nextFile);
-      setDuration(nextDuration);
-
-      setResult(null);
-      setVisibleTerms([]);
-
-      setError(null);
-      setStatus("idle");
-    },
-    [],
-  );
+    setError(null);
+    setStatus("idle");
+  },[],);
 
   async function handleAnalyse() {
     if (!file) {
@@ -69,8 +57,7 @@ export default function Home() {
     setError(null);
 
     try {
-      const analysisResult =
-        await analyseAudio(file);
+      const analysisResult = await analyseAudio(file);
 
       setResult(analysisResult);
 
@@ -98,9 +85,7 @@ export default function Home() {
     );
   }
 
-  function handleOpenSavedAnalysis(
-    savedAnalysis: AnalysisResult,
-  ) {
+  function handleOpenSavedAnalysis(savedAnalysis: AnalysisResult,) {
     setResult(savedAnalysis);
 
     setVisibleTerms(savedAnalysis.terms);
@@ -189,6 +174,7 @@ export default function Home() {
     <main className="min-h-screen bg-[#f7f5f0] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl items-center justify-center">
         <section className="w-full">
+          
           {/* Page heading */}
           <div className="mb-10 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#252421] text-white">

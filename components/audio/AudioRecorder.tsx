@@ -10,6 +10,7 @@ interface AudioRecorderProps {
 }
 
 export function AudioRecorder({ onAudioReady }: AudioRecorderProps) {
+  
   const {
     isRecording,
     audioBlob,

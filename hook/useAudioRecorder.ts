@@ -9,6 +9,7 @@ interface RecorderState {
 }
 
 function getSupportedMimeType(): string | undefined {
+
   if (typeof MediaRecorder === "undefined") {
     return undefined;
   }
@@ -23,6 +24,7 @@ function getSupportedMimeType(): string | undefined {
 }
 
 export function useAudioRecorder() {
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);

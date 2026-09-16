@@ -10,6 +10,7 @@ interface TranscriptProps {
 export default function Transcript({
   transcript,
 }: TranscriptProps) {
+  
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {

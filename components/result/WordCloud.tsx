@@ -59,11 +59,9 @@ export default function WordCloud({
   terms,
   onRemoveTerm,
 }: WordCloudProps) {
-  const [colorScheme, setColorScheme] =
-    useState<ColorScheme>("default");
 
-  const [shape, setShape] =
-    useState<CloudShape>("rectangular");
+  const [colorScheme, setColorScheme] = useState<ColorScheme>("default");
+  const [shape, setShape] = useState<CloudShape>("rectangular");
 
   const words = useMemo(
     () =>

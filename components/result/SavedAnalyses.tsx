@@ -18,9 +18,8 @@ interface SavedAnalysesProps {
 export default function SavedAnalyses({
   onOpen,
 }: SavedAnalysesProps) {
-  const [analyses, setAnalyses] = useState<
-    SavedAnalysis[]
-  >([]);
+
+  const [analyses, setAnalyses] = useState<SavedAnalysis[]>([]);
 
   useEffect(() => {
     setAnalyses(getSavedAnalyses());

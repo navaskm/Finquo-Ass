@@ -14,6 +14,7 @@ export default function AnalysisActions({
   transcript,
   terms,
 }: AnalysisActionsProps) {
+  
   const [saved, setSaved] = useState(false);
 
   function handleSave() {

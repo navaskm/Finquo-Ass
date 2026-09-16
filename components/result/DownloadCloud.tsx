@@ -9,6 +9,7 @@ interface DownloadCloudProps {
 export default function DownloadCloud({
   targetId = "word-cloud",
 }: DownloadCloudProps) {
+  
   async function handleDownload() {
     const element = document.getElementById(targetId);
 

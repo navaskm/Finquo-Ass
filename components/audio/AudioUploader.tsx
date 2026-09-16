@@ -10,6 +10,7 @@ interface AudioUploaderProps {
 }
 
 export function AudioUploader({ onAudioReady }: AudioUploaderProps) {
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
